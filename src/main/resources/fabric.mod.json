@@ -6,7 +6,7 @@
   "description": "在下草莓画手，能帮你自动画 ArtMap！",
   "authors": ["miniking1000","pythonchik","tgaisen"],
   "contact": {
-    "homepage": "",
+    "homepage": "https://github.com/Tgaisen/ArtMapDrawer",
     "sources": "https://github.com/Tgaisen/ArtMapDrawer",
     "issues": "https://github.com/Tgaisen/ArtMapDrawer/issues"
   },

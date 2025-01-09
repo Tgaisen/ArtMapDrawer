@@ -2,6 +2,9 @@
 这是 Mod [drawler](https://github.com/miniking1000/drawler) 的 Fork 版本，适配 DripDrop 服务器尺寸为 32×32 的 ArtMap，同时做了一些其他修改。  
 This is a fork of Mod [drawler](https://github.com/miniking1000/drawler), adapted to the 32×32 ArtMap size of the DripDrop server, and made some other modifications.
 
+## 获取
+请前往项目的 [Releases](https://github.com/miniking1000/drawler) 页面获取
+
 ## 修改
 * 图片来源改为本地
 * 添加简体中文语言
