@@ -4,6 +4,7 @@
   "key.drawler.pause": "pause drawing",
   "key.drawler.invert": "draw backwards",
   "key.drawler.goback": "step back",
+  "key.drawler.needtorender": "toggle render",
   "key.drawler.render": "toggle render",
 
   "settings.title.main": "Settings",
@@ -63,6 +64,7 @@
   "drawing.messages.id_missing": "map ID is not correct, map not found.",
   "drawing.messages.error": "Error. Please do not do what you did anymore.",
   "drawing.messages.done": "Done!",
+  "drawing.messages.done_sad_1": "Done! :(",
   "drawing.messages.done_sad": "Done! :(",
   "drawing.messages.completed": "Done!...",
   "drawing.messages.no_direction": "You have to look to some direction,",

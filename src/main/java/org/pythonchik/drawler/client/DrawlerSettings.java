@@ -19,13 +19,14 @@ import java.util.*;
 
 public class DrawlerSettings {
 
-    private static final File settings_file = new File("config/saved.yml");
+    private static final File settings_file = new File("config/artMapDrawer.yml");
     public static String[] Smodes = new String[]{"default", "discord", "loud"}; // IF THIS WILL USE TRANSALTABLES MOVE TO THE METHODS
 
     public static void saveSettings() {
         Map<String,Object> data = new HashMap<>();
         data.put("scale",DrawlerClient.scale);
         data.put("size",DrawlerClient.size);
+        data.put("needtorender",DrawlerClient.needtorender);
         data.put("delay",DrawlerClient.delay);
         data.put("mode34",DrawlerClient.mode34);
         data.put("needtocorrect",DrawlerClient.needtocorrect);
@@ -59,6 +60,7 @@ public class DrawlerSettings {
 
             DrawlerClient.scale = ((Number) data.getOrDefault("scale", 1)).floatValue();
             DrawlerClient.size = (Integer) data.getOrDefault("size", 32);
+            DrawlerClient.needtorender = (Boolean) data.getOrDefault("needtorender", false);
             DrawlerClient.delay = (Integer) data.getOrDefault("delay", 200);
             DrawlerClient.mode34 = (Boolean) data.getOrDefault("mode34", true);
             DrawlerClient.needtocorrect = (Boolean) data.getOrDefault("needtocorrect", true);
@@ -177,7 +179,7 @@ public class DrawlerSettings {
 
         //save name
         general.addEntry(entryBuilder.startStrField(Text.translatableWithFallback("settings.option.save_name", "check your localization file"), DrawlerClient.saveingname)
-                .setDefaultValue("drawler")
+                .setDefaultValue("ArtMapDrawer")
                 .setTooltip(Text.translatableWithFallback("settings.tooltip.save_name", "check your localization file"))
                 .setSaveConsumer(newValue -> {
                     if (newValue.length() >= 3 && newValue.length() <= 16){

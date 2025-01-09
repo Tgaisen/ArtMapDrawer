@@ -65,7 +65,7 @@ public class DrawlerClient implements ClientModInitializer {
     static double sideoff = 0.5;
     static boolean after = false;
     static boolean isDebug = false;
-    static boolean isDev = false;
+    static boolean isDev = true;
     static HashMap<ArrayList<Integer>, ArrayList<Float>> current;
     //static int curx = 0;
     //static int curz = 0;
@@ -94,7 +94,7 @@ public class DrawlerClient implements ClientModInitializer {
     static String soundPack = "default";
     static ArrayList<ArrayList<Integer>> tocorrect = new ArrayList<>();
     static int size = 32;
-    static int colorMultiplier = 128/size;
+    static int colorMultiplier = 128 / size;
     static int delay = 250;
     static int curIND = 0;
     static ScheduledFuture backup = null;
@@ -102,6 +102,7 @@ public class DrawlerClient implements ClientModInitializer {
     static ArrayList<Item> RenderingItems;
     private static KeyBinding openMenuKeyBinding;
     private static KeyBinding pauseKeyBinding;
+    private static KeyBinding needtorenderKeyBinding;
     private static KeyBinding renderKeyBinding;
     private static final Identifier MAP_CHKRBRD = Identifier.of("minecraft:textures/map/map_background.png");
 
@@ -129,12 +130,18 @@ public class DrawlerClient implements ClientModInitializer {
                     GLFW.GLFW_KEY_KP_2,
                     "category.drawler.modsettings"
             ));
+            needtorenderKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                    "key.drawler.needtorender",
+                    InputUtil.Type.KEYSYM,
+                    GLFW.GLFW_KEY_KP_3,
+                    "category.drawler.modsettings"
+            ));
         } //key binds init
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(ClientCommandManager.literal("artMapDrawer")
+            dispatcher.register(ClientCommandManager.literal("artmapdrawer")
 
-                    .then(literal("reset_drawing")
+                    .then(literal("reset")
                             .executes(context -> {
                                 url = "";
                                 curIND = 0;
@@ -152,8 +159,9 @@ public class DrawlerClient implements ClientModInitializer {
                                 current = new HashMap<>();
                                 send_translatable("drawing.messages.completed");
                                 return 1;
-                            }))
-                    .then(literal("drawler_check_items")
+                            })
+                    )
+                    .then(literal("checkitem")
                             .executes(context -> {
                                 if (todrawimg != null) {
                                     send_translatable("drawing.messages.missing_those");
@@ -163,77 +171,39 @@ public class DrawlerClient implements ClientModInitializer {
                                     send_translatable("drawing.messages.no_drawing");
                                 }
                                 return 1;
-                            }))
-                    .then(literal("FixYourself!")
+                            })
+                    )
+                    .then(literal("checkerror")
                             .executes(context -> {
                                 check_errors();
                                 return 1;
-                            }))
-                    .then(literal("set_drawing")
-                            .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, size))
-                                    .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, size))
+                            })
+                    )
+                    .then(literal("setdrawing")
+                            .then(literal("pos")
+                                    .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, size))
+                                            .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, size))
+                                                    .executes(context -> {
+                                                        send_translatable("drawing.messages.cords_changed", curIND, IntegerArgumentType.getInteger(context, "x") + size * IntegerArgumentType.getInteger(context, "y"));
+                                                        curIND = IntegerArgumentType.getInteger(context, "y") * size + IntegerArgumentType.getInteger(context, "x");
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+                            )
+                            .then(literal("point")
+                                    .then(ClientCommandManager.argument("point", IntegerArgumentType.integer(0, size * size))
                                             .executes(context -> {
-                                                send_translatable("drawing.messages.cords_changed", curIND, IntegerArgumentType.getInteger(context, "x") + size * IntegerArgumentType.getInteger(context, "y"));
-                                                curIND = IntegerArgumentType.getInteger(context, "y") * size + IntegerArgumentType.getInteger(context, "x");
+                                                send_translatable("drawing.messages.cords_changed", curIND, IntegerArgumentType.getInteger(context, "point"));
+                                                curIND = IntegerArgumentType.getInteger(context, "point");
                                                 return 1;
-                                            }))))
-                    .then(literal("set_drawing")
-                            .then(ClientCommandManager.argument("point", IntegerArgumentType.integer(0, size * size))
-                                    .executes(context -> {
-                                        send_translatable("drawing.messages.cords_changed", curIND, IntegerArgumentType.getInteger(context, "point"));
-                                        curIND = IntegerArgumentType.getInteger(context, "point");
-                                        return 1;
-                                    })))
-                    .then(literal("set_camera")
-                            .then(ClientCommandManager.argument("point", IntegerArgumentType.integer(0, size * size))
-                                    .executes(context -> {
-                                        HashMap<ArrayList<Integer>, ArrayList<Float>> current = new HashMap<>();
-                                        switch (MinecraftClient.getInstance().player.getHorizontalFacing()) {
-                                            case EAST -> current = DrawlerConfig.east;
-                                            case WEST -> current = DrawlerConfig.west;
-                                            case NORTH -> current = DrawlerConfig.north;
-                                            case SOUTH -> current = DrawlerConfig.south;
-                                            default -> {
-                                                send_translatable("drawing.messages.no_direction");
-                                                return 1;
-                                            }
-                                        }
-                                        int ind = IntegerArgumentType.getInteger(context, "point");
-                                        ArrayList<Integer> temp = new ArrayList<>();
-                                        temp.add(ind - (ind / size) * size);
-                                        temp.add(ind / size);
-
-                                        for (HashMap.Entry<ArrayList<Integer>, ArrayList<Float>> list : current.entrySet()) {
-                                            if (list.getKey().equals(temp)) {
-                                                ArrayList<Float> degree = list.getValue();
-                                                MinecraftClient.getInstance().player.setYaw(degree.get(0));
-                                                MinecraftClient.getInstance().player.setPitch(degree.get(1));
-                                            }
-                                        }
-                                        if (!pixeldata.isEmpty()) {
-                                            for (ArrayList<Integer> entry : pixeldata) {
-                                                if (entry.get(0).equals(temp.get(0)) && entry.get(1).equals(temp.get(1))) {
-                                                    Item ToFind = DrawlerConfig.items.get(entry.get(2));
-                                                    if (entry.get(3).equals(1)) { //nothing
-                                                        send_translatable("drawing.messages.item_for_this", I18n.translate(ToFind.getTranslationKey()));
-                                                    } else if (entry.get(3).equals(2)) { //feather 1
-                                                        send_translatable("drawing.messages.items_for_this", I18n.translate(ToFind.getTranslationKey()), I18n.translate(Items.FEATHER.getTranslationKey()));
-                                                    } else if (entry.get(3).equals(0)) { //coal 1
-                                                        send_translatable("drawing.messages.items_for_this", I18n.translate(ToFind.getTranslationKey()), I18n.translate(Items.COAL.getTranslationKey()));
-                                                    } else if (entry.get(3).equals(3)) { //coal 2
-                                                        send_translatable("drawing.messages.itemss_for_this", I18n.translate(ToFind.getTranslationKey()), I18n.translate(Items.COAL.getTranslationKey()), I18n.translate(Items.COAL.getTranslationKey()));
-                                                    }
-                                                    break;
-                                                }
-                                            }
-                                        } else {
-                                            send_translatable("drawing.messages.done");
-                                        }
-                                        return 1;
-                                    })))
-                    .then(literal("drawler_set_camera")
-                            .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, size))
-                                    .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, size))
+                                            })
+                                    )
+                            )
+                    )
+                    .then(literal("setcamera")
+                            .then(literal("point")
+                                    .then(ClientCommandManager.argument("point", IntegerArgumentType.integer(0, size * size))
                                             .executes(context -> {
                                                 HashMap<ArrayList<Integer>, ArrayList<Float>> current = new HashMap<>();
                                                 switch (MinecraftClient.getInstance().player.getHorizontalFacing()) {
@@ -246,10 +216,10 @@ public class DrawlerClient implements ClientModInitializer {
                                                         return 1;
                                                     }
                                                 }
-
+                                                int ind = IntegerArgumentType.getInteger(context, "point");
                                                 ArrayList<Integer> temp = new ArrayList<>();
-                                                temp.add(IntegerArgumentType.getInteger(context, "x"));
-                                                temp.add(IntegerArgumentType.getInteger(context, "y"));
+                                                temp.add(ind - (ind / size) * size);
+                                                temp.add(ind / size);
 
                                                 for (HashMap.Entry<ArrayList<Integer>, ArrayList<Float>> list : current.entrySet()) {
                                                     if (list.getKey().equals(temp)) {
@@ -278,8 +248,62 @@ public class DrawlerClient implements ClientModInitializer {
                                                     send_translatable("drawing.messages.done");
                                                 }
                                                 return 1;
-                                            }))))
-                    .then(literal("drawpic")
+                                            })
+                                    )
+                            )
+                            .then(literal("pos")
+                                    .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, size))
+                                            .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, size))
+                                                    .executes(context -> {
+                                                        HashMap<ArrayList<Integer>, ArrayList<Float>> current = new HashMap<>();
+                                                        switch (MinecraftClient.getInstance().player.getHorizontalFacing()) {
+                                                            case EAST -> current = DrawlerConfig.east;
+                                                            case WEST -> current = DrawlerConfig.west;
+                                                            case NORTH -> current = DrawlerConfig.north;
+                                                            case SOUTH -> current = DrawlerConfig.south;
+                                                            default -> {
+                                                                send_translatable("drawing.messages.no_direction");
+                                                                return 1;
+                                                            }
+                                                        }
+
+                                                        ArrayList<Integer> temp = new ArrayList<>();
+                                                        temp.add(IntegerArgumentType.getInteger(context, "x"));
+                                                        temp.add(IntegerArgumentType.getInteger(context, "y"));
+
+                                                        for (HashMap.Entry<ArrayList<Integer>, ArrayList<Float>> list : current.entrySet()) {
+                                                            if (list.getKey().equals(temp)) {
+                                                                ArrayList<Float> degree = list.getValue();
+                                                                MinecraftClient.getInstance().player.setYaw(degree.get(0));
+                                                                MinecraftClient.getInstance().player.setPitch(degree.get(1));
+                                                            }
+                                                        }
+                                                        if (!pixeldata.isEmpty()) {
+                                                            for (ArrayList<Integer> entry : pixeldata) {
+                                                                if (entry.get(0).equals(temp.get(0)) && entry.get(1).equals(temp.get(1))) {
+                                                                    Item ToFind = DrawlerConfig.items.get(entry.get(2));
+                                                                    if (entry.get(3).equals(1)) { //nothing
+                                                                        send_translatable("drawing.messages.item_for_this", I18n.translate(ToFind.getTranslationKey()));
+                                                                    } else if (entry.get(3).equals(2)) { //feather 1
+                                                                        send_translatable("drawing.messages.items_for_this", I18n.translate(ToFind.getTranslationKey()), I18n.translate(Items.FEATHER.getTranslationKey()));
+                                                                    } else if (entry.get(3).equals(0)) { //coal 1
+                                                                        send_translatable("drawing.messages.items_for_this", I18n.translate(ToFind.getTranslationKey()), I18n.translate(Items.COAL.getTranslationKey()));
+                                                                    } else if (entry.get(3).equals(3)) { //coal 2
+                                                                        send_translatable("drawing.messages.itemss_for_this", I18n.translate(ToFind.getTranslationKey()), I18n.translate(Items.COAL.getTranslationKey()), I18n.translate(Items.COAL.getTranslationKey()));
+                                                                    }
+                                                                    break;
+                                                                }
+                                                            }
+                                                        } else {
+                                                            send_translatable("drawing.messages.done");
+                                                        }
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+                            )
+                    )
+                    .then(literal("draw")
                             .then(ClientCommandManager.argument("画布 ID", IntegerArgumentType.integer(0))
                                     .then(ClientCommandManager.argument("图片路径", StringArgumentType.greedyString())
                                             .executes(context -> {
@@ -292,7 +316,10 @@ public class DrawlerClient implements ClientModInitializer {
                                                 }, 0, TimeUnit.MILLISECONDS);
                                                 backup.shutdown();
                                                 return 1;
-                                            }))))
+                                            })
+                                    )
+                            )
+                    )
             );
         });
 
@@ -307,6 +334,7 @@ public class DrawlerClient implements ClientModInitializer {
                     return;
                 }
                 isdrawin = !isdrawin;
+                needtorender = true;
                 if (isdrawin) {
                     send_translatable("drawing.messages.continuing_from", curIND);
                     MapState mapState = MinecraftClient.getInstance().world.getMapState(new MapIdComponent(mapid));
@@ -343,8 +371,12 @@ public class DrawlerClient implements ClientModInitializer {
                 }
             }
 
-            while (renderKeyBinding.wasPressed()) {
+            while (needtorenderKeyBinding.wasPressed()) {
                 worldrender = !worldrender;
+                send_translatable("drawing.messages.done_sad_1");
+            }
+            while (renderKeyBinding.wasPressed()) {
+                needtorender = !needtorender;
                 send_translatable("drawing.messages.done_sad");
             }
         }); //end of client tick (key presses)
@@ -501,16 +533,27 @@ public class DrawlerClient implements ClientModInitializer {
                         send_translatable("drawing.saving.invalid_name");
                     }
                 }
+                url = "";
+                curIND = 0;
+                worldrender = false;
+                mapid = -1;
+                isdrawin = false;
+                needtocorrect = true;
+                iscorrectin = false;
+                isthere = false;
+                todrawimg = null;
+                RenderingItems = null;
+                ItemMap = null;
+                tocorrect = new ArrayList<>();
+                ItemMap = new HashMap<>();
+                current = new HashMap<>();
                 //TODO continued drawing in queue
             } else {
                 send_translatable("correction.messages.yes_errors__correcting", tocorrect.size(), timeMS / 3600000, (timeMS / 60000) % 60, (timeMS / 1000) % 60);
                 playSound(soundPack + "_error");
-                gonext();
-                /*
                 if (backup.isCancelled() || backup.isDone()) {
                     gonext();
                 }
-                */
             }
         } else {
             send_translatable("drawing.messages.id_missing");
@@ -879,7 +922,7 @@ public class DrawlerClient implements ClientModInitializer {
                 RenderingItems = new ArrayList<>();
             }
         } else {
-            send_translatable("drawing.messages.id_missing");
+            //send_translatable("drawing.messages.id_missing");
             RenderingItems = new ArrayList<>();
         }
     }
@@ -904,6 +947,7 @@ public class DrawlerClient implements ClientModInitializer {
                     send_translatable("correction.messages.completed");
                     isdrawin = false;
                     iscorrectin = false;
+                    needtorender = false;
                     check_errors();
                 }
             } else {
@@ -924,13 +968,14 @@ public class DrawlerClient implements ClientModInitializer {
                         send_translatable("drawing.messages.id_missing");
                         return;
                     }
-                    while (((MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) / 4)).id == Cid) &&
+                    while (isdrawin && ((MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) / 4)).id == Cid) &&
                             ((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) - MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier])) / 4).id * 4) == Cvr))) {
                         curIND += 1;
                         if (!(pixeldata.size() > curIND && curIND >= 0)) {
-                            send_translatable("drawing.errors.index_too_big");
+                            //send_translatable("drawing.errors.index_too_big");
                             isdrawin = false;
                             curIND = 0;
+                            needtorender = false;
                             if (needtocorrect) check_errors();
                             break;
                         } else {
@@ -945,7 +990,7 @@ public class DrawlerClient implements ClientModInitializer {
                     draw(pixeldata.get(curIND));
                     curIND += 1;
                 } else {
-                    send_translatable("drawing.errors.index_too_big");
+                    //send_translatable("drawing.errors.index_too_big");
                     isdrawin = false;
                     curIND = 0;
                     if (needtocorrect) check_errors();
@@ -963,7 +1008,7 @@ public class DrawlerClient implements ClientModInitializer {
         if (MinecraftClient.getInstance().crosshairTarget == null) return;
         MapState mapState = MinecraftClient.getInstance().world.getMapState(new MapIdComponent(mapid));
         if (mapState == null) {
-            send_translatable("drawing.messages.id_missing");
+            //send_translatable("drawing.messages.id_missing");
             return;
         }
         ScheduledExecutorService serv = Executors.newScheduledThreadPool(1);
@@ -1593,7 +1638,7 @@ public class DrawlerClient implements ClientModInitializer {
      * @param args    arguments for the translation
      */
     public static void send_translatable(String message, Object... args) {
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("§7[§6Drawler§7]§r ").append(Text.literal(I18n.translate(message, args))));
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("§7[§6草莓画手§7]§r ").append(Text.literal(I18n.translate(message, args))));
     }
 
     /**
