@@ -26,7 +26,6 @@ public class DrawlerSettings {
         Map<String,Object> data = new HashMap<>();
         data.put("scale",DrawlerClient.scale);
         data.put("size",DrawlerClient.size);
-        data.put("needtorender",DrawlerClient.needtorender);
         data.put("delay",DrawlerClient.delay);
         data.put("mode34",DrawlerClient.mode34);
         data.put("needtocorrect",DrawlerClient.needtocorrect);
@@ -60,7 +59,6 @@ public class DrawlerSettings {
 
             DrawlerClient.scale = ((Number) data.getOrDefault("scale", 1)).floatValue();
             DrawlerClient.size = (Integer) data.getOrDefault("size", 32);
-            DrawlerClient.needtorender = (Boolean) data.getOrDefault("needtorender", false);
             DrawlerClient.delay = (Integer) data.getOrDefault("delay", 200);
             DrawlerClient.mode34 = (Boolean) data.getOrDefault("mode34", true);
             DrawlerClient.needtocorrect = (Boolean) data.getOrDefault("needtocorrect", true);
@@ -131,14 +129,6 @@ public class DrawlerSettings {
                 .setDefaultValue(0x80FF0000)
                 .setTooltip(Text.translatableWithFallback("settings.tooltip.highlighting_color","check your localization file"))
                 .setSaveConsumer(newValue -> DrawlerClient.highlightColor = newValue)
-                .build());
-
-
-        //rendering
-        general.addEntry(entryBuilder.startBooleanToggle(Text.translatableWithFallback("settings.option.rendering","check your localization file"), DrawlerClient.needtorender)
-                .setDefaultValue(false)
-                .setTooltip(Text.translatableWithFallback("settings.tooltip.rendering","check your localization file"))
-                .setSaveConsumer(newValue -> DrawlerClient.needtorender = newValue)
                 .build());
 
         //SCALE

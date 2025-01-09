@@ -64,7 +64,7 @@
   "drawing.messages.id_missing": "地图 ID 不正确，未找到地图。",
   "drawing.messages.error": "错误。请不要再这样做。",
   "drawing.messages.done": "完成！",
-  "drawing.messages.done_sad": "已暂时切换预览图显示",
+  "drawing.messages.done_sad": "已切换预览图显示",
   "drawing.messages.done_sad_1": "已切换效果图显示",
   "drawing.messages.completed": "完成！...",
   "drawing.messages.no_direction": "您需要面向某个方向，",

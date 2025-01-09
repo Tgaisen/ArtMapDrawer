@@ -148,7 +148,7 @@ public class DrawlerClient implements ClientModInitializer {
                                 worldrender = false;
                                 mapid = -1;
                                 isdrawin = false;
-                                needtocorrect = true;
+                                needtocorrect = false;
                                 iscorrectin = false;
                                 isthere = false;
                                 todrawimg = null;
@@ -643,7 +643,10 @@ public class DrawlerClient implements ClientModInitializer {
                 send_translatable("drawing.messages.item_to_collect");
                 check_item();
             } else {
-                send_translatable("drawing.messages.items_collected");
+                MapState mapState = MinecraftClient.getInstance().world.getMapState(new MapIdComponent(mapid));
+                if (mapState != null) {
+                    send_translatable("drawing.messages.items_collected");
+                }
             }
         } catch (Exception ignored) {
             send_translatable("drawing.messages.check_img");
@@ -857,11 +860,11 @@ public class DrawlerClient implements ClientModInitializer {
                 }
             }
             if (!MinecraftClient.getInstance().player.getInventory().containsAny(Set.of(Items.COAL))) {
-                send_translatable(Items.COAL.getTranslationKey());
+                //send_translatable(Items.COAL.getTranslationKey());
                 return true;
             }
             if (!MinecraftClient.getInstance().player.getInventory().containsAny(Set.of(Items.FEATHER))) {
-                send_translatable(Items.FEATHER.getTranslationKey());
+                //send_translatable(Items.FEATHER.getTranslationKey());
                 return true;
             }
         } else {
