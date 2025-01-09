@@ -230,21 +230,21 @@ public class DrawlerSettings {
 
             //render distance
             deeeeev.addEntry(entryBuilder.startDoubleField(Text.translatableWithFallback("settings.option.depth", "check your localization file"), DrawlerClient.depth)
-                    .setDefaultValue(2.56)
+                    .setDefaultValue(0.64)
                     .setTooltip(Text.translatableWithFallback("settings.tooltip.depth", "check your localization file"))
                     .setSaveConsumer(newValue -> DrawlerClient.depth = newValue)
                     .build());
 
             //render height
             deeeeev.addEntry(entryBuilder.startDoubleField(Text.translatableWithFallback("settings.option.height", "check your localization file"), DrawlerClient.height)
-                    .setDefaultValue(4.488)
+                    .setDefaultValue(1.122)
                     .setTooltip(Text.translatableWithFallback("settings.tooltip.height", "check your localization file"))
                     .setSaveConsumer(newValue -> DrawlerClient.height = newValue)
                     .build());
 
             //render side offset
             deeeeev.addEntry(entryBuilder.startDoubleField(Text.translatableWithFallback("settings.option.sideoff", "check your localization file"), DrawlerClient.sideoff)
-                    .setDefaultValue(2)
+                    .setDefaultValue(0.5)
                     .setTooltip(Text.translatableWithFallback("settings.tooltip.sideoff", "check your localization file"))
                     .setSaveConsumer(newValue -> DrawlerClient.sideoff = newValue)
                     .build());

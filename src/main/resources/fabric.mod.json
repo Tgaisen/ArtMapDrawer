@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "artmapdrawer",
   "version": "${version}",
-  "name": "ArtMap Drawer for DripDrop",
+  "name": "ArtMap Drawer",
   "description": "在下草莓画手，能帮你自动画 ArtMap！",
   "authors": ["miniking1000","pythonchik","tgaisen"],
   "contact": {
