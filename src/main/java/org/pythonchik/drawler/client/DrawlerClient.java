@@ -334,38 +334,41 @@ public class DrawlerClient implements ClientModInitializer {
                     return;
                 }
                 isdrawin = !isdrawin;
-                needtorender = true;
                 if (isdrawin) {
                     send_translatable("drawing.messages.continuing_from", curIND);
                     MapState mapState = MinecraftClient.getInstance().world.getMapState(new MapIdComponent(mapid));
-                    int timeMS = 0;
-                    for (int y = 0; y < size; y++) {
-                        for (int x = 0; x < size; x++) {
-                            int Cid = DrawlerConfig.getColorID(new Color(todrawimg.getRGB(x, y)));
-                            int Cvr = DrawlerConfig.getColorVariant(new Color(todrawimg.getRGB(x, y)));
-                            if (!((MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) / 4)).id == Cid) &&
-                                    ((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) - MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier])) / 4).id * 4) == Cvr))) {
-                                Color color = new Color(todrawimg.getRGB(x, y));
-                                if (!(MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) / 4)).id == Cid)) {
-                                    timeMS += delay * (DrawlerConfig.getColorVariant(color) == 1 ? 2 : DrawlerConfig.getColorVariant(color) == 3 ? 5 : 4);
-                                    continue;
-                                }
-                                // base color is correct:
-                                int CCvr = (Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) - MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier])) / 4).id * 4);
-                                if (CCvr == 1) {
-                                    timeMS += delay * ((Cvr == 2 || Cvr == 0) ? 3 : 4);
-                                } else if (CCvr == 0) {
-                                    timeMS += delay * ((Cvr == 3 || Cvr == 1) ? 3 : 4);
-                                } else if (CCvr == 2) {
-                                    timeMS += delay * (Cvr == 1 ? 3 : Cvr == 0 ? 4 : 5);
-                                } else {
-                                    timeMS += delay * (Cvr == 0 ? 3 : Cvr == 1 ? 4 : 5);
+                    if (mapState != null) {
+                        int timeMS = 0;
+                        for (int y = 0; y < size; y++) {
+                            for (int x = 0; x < size; x++) {
+                                int Cid = DrawlerConfig.getColorID(new Color(todrawimg.getRGB(x, y)));
+                                int Cvr = DrawlerConfig.getColorVariant(new Color(todrawimg.getRGB(x, y)));
+                                if (!((MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) / 4)).id == Cid) &&
+                                        ((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) - MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier])) / 4).id * 4) == Cvr))) {
+                                    Color color = new Color(todrawimg.getRGB(x, y));
+                                    if (!(MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) / 4)).id == Cid)) {
+                                        timeMS += delay * (DrawlerConfig.getColorVariant(color) == 1 ? 2 : DrawlerConfig.getColorVariant(color) == 3 ? 5 : 4);
+                                        continue;
+                                    }
+                                    // base color is correct:
+                                    int CCvr = (Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier]) - MapColor.get((Byte.toUnsignedInt(mapState.colors[y * colorMultiplier * 128 + x * colorMultiplier])) / 4).id * 4);
+                                    if (CCvr == 1) {
+                                        timeMS += delay * ((Cvr == 2 || Cvr == 0) ? 3 : 4);
+                                    } else if (CCvr == 0) {
+                                        timeMS += delay * ((Cvr == 3 || Cvr == 1) ? 3 : 4);
+                                    } else if (CCvr == 2) {
+                                        timeMS += delay * (Cvr == 1 ? 3 : Cvr == 0 ? 4 : 5);
+                                    } else {
+                                        timeMS += delay * (Cvr == 0 ? 3 : Cvr == 1 ? 4 : 5);
+                                    }
                                 }
                             }
                         }
+                        send_translatable("drawing.messages.time_remaining", timeMS / 3600000, (timeMS / 60000) % 60, (timeMS / 1000) % 60);
+                        gonext();
+                    } else {
+                        send_translatable("drawing.messages.id_missing");
                     }
-                    send_translatable("drawing.messages.time_remaining", timeMS / 3600000, (timeMS / 60000) % 60, (timeMS / 1000) % 60);
-                    gonext();
                 } else {
                     send_translatable("drawing.messages.pausing_on", curIND);
                 }
@@ -634,6 +637,7 @@ public class DrawlerClient implements ClientModInitializer {
             isdrawin = false;
             iscorrectin = false;
             tocorrect = new ArrayList<>();
+            needtorender = true;
             updateRender();
             if (bacK_check_item()) {
                 send_translatable("drawing.messages.item_to_collect");
