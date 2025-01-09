@@ -148,7 +148,8 @@ public class DrawlerClient implements ClientModInitializer {
                                 worldrender = false;
                                 mapid = -1;
                                 isdrawin = false;
-                                needtocorrect = false;
+                                needtocorrect = true;
+                                needtorender = false;
                                 iscorrectin = false;
                                 isthere = false;
                                 todrawimg = null;
