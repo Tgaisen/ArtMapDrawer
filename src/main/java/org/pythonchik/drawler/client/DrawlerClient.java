@@ -926,11 +926,13 @@ public class DrawlerClient implements ClientModInitializer {
                     }
                 }
             }
+            /*
             if (RenderingItems.size() == 2) {
                 RenderingItems = new ArrayList<>();
             }
+            */
         } else {
-            //send_translatable("drawing.messages.id_missing");
+            send_translatable("drawing.messages.id_missing");
             RenderingItems = new ArrayList<>();
         }
     }
