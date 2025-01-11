@@ -380,6 +380,19 @@ public class DrawlerClient implements ClientModInitializer {
                             }
                         }
                         send_translatable("drawing.messages.time_remaining", timeMS / 3600000, (timeMS / 60000) % 60, (timeMS / 1000) % 60);
+
+                        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+                        debug(player.getHorizontalFacing().toString());
+                        switch (player.getHorizontalFacing()) {
+                            case EAST -> current = DrawlerConfig.east;
+                            case WEST -> current = DrawlerConfig.west;
+                            case NORTH -> current = DrawlerConfig.north;
+                            case SOUTH -> current = DrawlerConfig.south;
+                            default -> {
+                                send_translatable("drawing.messages.no_direction");
+                                return;
+                            }
+                        } //choosing correct angles
                         gonext();
                     } else {
                         send_translatable("drawing.messages.id_missing");
