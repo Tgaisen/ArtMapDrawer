@@ -84,6 +84,7 @@
   "drawing.messages.item_for_this": "%s - 绘制此像素所需的物品",
   "drawing.messages.items_for_this": "%s + %s - 绘制此像素所需的物品",
   "drawing.messages.itemss_for_this": "%s + %s + %s - 绘制此像素所需的物品",
+  "drawing.messages.map_id": "该画布的 ID 是：%s",
 
   "drawing.saving.no_slots": "§c您没有可用的空槽保存画作",
   "drawing.saving.saved_as": "画作已 §a成功 §r保存为 %s",
@@ -93,6 +94,8 @@
   "drawing.errors.YOU_CAN_NOT_comment": "请不要翻译这个，让它保持原样。",
   "drawing.errors.drawing_mode": "错误：无效的绘图模式值。",
   "drawing.errors.correction_mode": "错误：无效的修正模式值。",
+  "drawing.errors.empty_map": "手上未拿画布",
+  "drawing.errors.invalid_map": "该画布无效",
   "drawing.errors.empty_items": "物品列表为空，您没有在绘制任何东西...",
   "drawing.errors.index_too_big": "像素超出范围或索引过大",
 

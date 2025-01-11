@@ -77,6 +77,7 @@
   "drawing.messages.item_for_this": "%s - предмет нужный для рисования этого пикселя",
   "drawing.messages.items_for_this": "%s + %s - предметы нужные для рисования данного пикселя",
   "drawing.messages.itemss_for_this": "%s + %s + %s - предметы нужные для рисования этого пикселя",
+  "drawing.messages.map_id": "The ID of this canvas is:%s",
 
   "drawing.saving.no_slots": "§cУ вас нету свободного места в инвентаре что-бы сохранить картину",
   "drawing.saving.saved_as": "Картина была §aуспешно сохранена §rкак %s",
@@ -86,6 +87,8 @@
   "drawing.errors.YOU_CAN_NOT_comment": "please, don't translate it, just let it be.",
   "drawing.errors.drawing_mode": "Ошибка: Неверный режим рисования",
   "drawing.errors.correction_mode": "Ошибка: Неверный режим исправления",
+  "drawing.errors.empty_map": "No canvas in hand",
+  "drawing.errors.invalid_map": "Invalid canvas",
   "drawing.errors.empty_items": "Список ресурсов пустой, вы ничего не рисуете...",
   "drawing.errors.index_too_big": "Пиксели закончились, или индекс слишком большой",
 

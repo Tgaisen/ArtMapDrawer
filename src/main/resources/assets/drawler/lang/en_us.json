@@ -84,6 +84,7 @@
   "drawing.messages.item_for_this": "%s - item needed to draw this pixel",
   "drawing.messages.items_for_this": "%s + %s - items needed to draw this pixel",
   "drawing.messages.itemss_for_this": "%s + %s + %s - items needed to draw this pixel",
+  "drawing.messages.map_id": "The ID of this canvas is:%s",
 
   "drawing.saving.no_slots": "§cYou have no free slots to save the art",
   "drawing.saving.saved_as": "Art was §asuccessfully §rsaved as %s",
@@ -93,6 +94,8 @@
   "drawing.errors.YOU_CAN_NOT_comment": "please, don't translate it, just let it be.",
   "drawing.errors.drawing_mode": "Error: Invalid drawing mode value.",
   "drawing.errors.correction_mode": "Error: Invalid correction mode value.",
+  "drawing.errors.empty_map": "No canvas in hand",
+  "drawing.errors.invalid_map": "Invalid canvas",
   "drawing.errors.empty_items": "Item list is empty, you are not drawing anything...",
   "drawing.errors.index_too_big": "Out of pixels, or index is too large",
 

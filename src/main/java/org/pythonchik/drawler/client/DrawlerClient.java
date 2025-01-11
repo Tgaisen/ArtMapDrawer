@@ -20,6 +20,8 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -50,6 +52,11 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
+
+import net.minecraft.entity.*;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
+import net.minecraft.nbt.NbtCompound;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
@@ -320,6 +327,13 @@ public class DrawlerClient implements ClientModInitializer {
                                             })
                                     )
                             )
+                    )
+                    .then(literal("getmapid")
+                            .executes(context -> {
+                                //hasToolItemInHand(MinecraftClient.getInstance().player, Hand.MAIN_HAND);
+                                getMapID();
+                                return 1;
+                            })
                     )
             );
         });
@@ -876,7 +890,7 @@ public class DrawlerClient implements ClientModInitializer {
 
     private static void check_item() {
         boolean temp = false;
-        if (ItemMap.isEmpty()) {
+        if (ItemMap == null || ItemMap.isEmpty()) {
             send_translatable("drawing.errors.empty_items");
             return;
         }
@@ -1658,6 +1672,22 @@ public class DrawlerClient implements ClientModInitializer {
      */
     public static void debug(String message) {
         if (isDebug) Drawler.LOGGER.info(message);
+    }
+
+    public static void getMapID() {
+        ItemStack mainHandItem = MinecraftClient.getInstance().player.getMainHandStack();
+        if (mainHandItem != null && mainHandItem.getItem() == Items.FILLED_MAP) {
+            // get map NBT
+            ComponentMap data = mainHandItem.getComponents();
+            if (data != null) {
+                MapIdComponent mapId = data.get(DataComponentTypes.MAP_ID);
+                send_translatable("drawing.messages.map_id", mapId.id());
+            } else {
+                send_translatable("drawing.errors.invalid_map");
+            }
+        } else {
+            send_translatable("drawing.errors.empty_map");
+        }
     }
 
 }
